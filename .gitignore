@@ -1,0 +1,15 @@
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+
+# Dependency directory
+node_modules
+
+# Debug log from npm
+npm-debug.log
+results/
