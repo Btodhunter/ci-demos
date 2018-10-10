@@ -54,6 +54,7 @@ container_scan:
         if [ "${ANCHORE_FAIL_ON_POLICY}" == "true" ]; then
           anchore-cli evaluate check ${IMAGE_NAME}
         else
+          set +o pipefail
           anchore-cli evaluate check ${IMAGE_NAME} | tee /dev/null
         fi
 
