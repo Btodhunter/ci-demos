@@ -1,4 +1,6 @@
-### Demo of a container build pipeline, including Anchore security scanning
+# Anchore GitLab Demo
+
+### Example of a container build pipeline, which includes Anchore container security scanning
 
 Contains a very simple Nodejs application, which is published to a registry as a runnable docker container.
 
