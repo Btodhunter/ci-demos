@@ -29,7 +29,7 @@ container_scan:
     name: anchore/anchore-engine:latest
     entrypoint: [""]
   services:
-    - name: btodhunter/engine-db-preload:latest
+    - name: anchore/engine-db-preload:latest
       alias: anchore-db
 
   variables:
