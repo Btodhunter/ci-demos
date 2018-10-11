@@ -17,9 +17,9 @@ container_build:
 
   script:
     - docker_login
-    - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG} || true
-    - docker build --cache-from ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG} -t ${IMAGE_NAME} .
-    - docker push ${IMAGE_NAME}
+    - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
+    - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
+    - docker push "$IMAGE_NAME"
 
 container_scan:
   stage: scan
@@ -37,7 +37,7 @@ container_scan:
     ANCHORE_CLI_USER: "admin"
     ANCHORE_CLI_PASS: "foobar"
     ANCHORE_CLI_SSL_VERIFY: "n"
-    ANCHORE_FAIL_ON_POLICY: 'false'
+    ANCHORE_FAIL_ON_POLICY: "false"
     ANCHORE_TIMEOUT: 500
 
   script:
@@ -46,14 +46,14 @@ container_scan:
         chmod +x /tmp/anchore_ci_tools.py
         ln -s /tmp/anchore_ci_tools.py /usr/local/bin/anchore_ci_tools
     - anchore_ci_tools --setup
-    - anchore-cli registry add ${CI_REGISTRY} gitlab-ci-token ${CI_JOB_TOKEN} --skip-validate
-    - anchore_ci_tools --analyze --report --image ${IMAGE_NAME} --timeout ${ANCHORE_TIMEOUT}
+    - anchore-cli registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate
+    - anchore_ci_tools --analyze --report --image "$IMAGE_NAME "--timeout "$ANCHORE_TIMEOUT"
     - |
-        if [ "${ANCHORE_FAIL_ON_POLICY}" == "true" ]; then
-          anchore-cli evaluate check ${IMAGE_NAME}
+        if [ "$ANCHORE_FAIL_ON_POLICY" == "true" ]; then
+          anchore-cli evaluate check "$IMAGE_NAME"
         else
           set +o pipefail
-          anchore-cli evaluate check ${IMAGE_NAME} | tee /dev/null
+          anchore-cli evaluate check "$IMAGE_NAME" | tee /dev/null
         fi
 
   artifacts:
@@ -73,13 +73,13 @@ container_publish:
 
   script:
     - docker_login
-    - docker pull ${IMAGE_NAME}
-    - docker tag ${IMAGE_NAME} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
-    - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
+    - docker pull "$IMAGE_NAME"
+    - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
     - |
-        if [ $CI_COMMIT_REF_NAME == "master" ]; then
-          docker tag ${IMAGE_NAME} ${CI_REGISTRY_IMAGE}:latest
-          docker push ${CI_REGISTRY_IMAGE}:latest
+        if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+          docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
+          docker push "${CI_REGISTRY_IMAGE}:latest"
         fi
 
 # Note: YAML anchors allow an object to be re-used, reducing duplication.
@@ -90,7 +90,7 @@ container_publish:
 # Functions are setup in the global 'before_script:' section.
 .load_helper_functions: &load_helper_functions |
   function docker_login() {
-    docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+    docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
   }
 
 before_script:
