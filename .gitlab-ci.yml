@@ -15,10 +15,8 @@ container_build:
   variables:
     DOCKER_DRIVER: overlay2
 
-  before_script:
-    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-
   script:
+    - docker_login
     - docker pull ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG} || true
     - docker build --cache-from ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG} -t ${IMAGE_NAME} .
     - docker push ${IMAGE_NAME}
@@ -34,12 +32,6 @@ container_scan:
 
   variables:
     GIT_STRATEGY: none
-    ANCHORE_HOST_ID: "localhost"
-    ANCHORE_ENDPOINT_HOSTNAME: "localhost"
-    ANCHORE_CLI_USER: "admin"
-    ANCHORE_CLI_PASS: "foobar"
-    ANCHORE_CLI_SSL_VERIFY: "n"
-    ANCHORE_FAIL_ON_POLICY: "false"
     ANCHORE_TIMEOUT: 500
 
   script:
@@ -73,15 +65,27 @@ container_publish:
     DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
 
-  before_script:
-    - docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
-
   script:
+    - docker_login
     - docker pull ${IMAGE_NAME}
     - docker tag ${IMAGE_NAME} ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
     - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}
     - |
         if [ $CI_COMMIT_REF_NAME == "master" ]; then
-        docker tag ${IMAGE_NAME} ${CI_REGISTRY_IMAGE}:latest
-        docker push ${CI_REGISTRY_IMAGE}:latest
+          docker tag ${IMAGE_NAME} ${CI_REGISTRY_IMAGE}:latest
+          docker push ${CI_REGISTRY_IMAGE}:latest
         fi
+
+# Note: YAML anchors allow an object to be re-used, reducing duplication.
+# The ampersand declares an alias for an object, then later the `*name`
+# syntax dereferences it.
+
+# Use YAML anchor to create helper functions that can be called in all jobs.
+# Functions are setup in the global 'before_script:' section.
+.load_helper_functions: &load_helper_functions |
+  function docker_login() {
+    docker login -u gitlab-ci-token -p ${CI_JOB_TOKEN} ${CI_REGISTRY}
+  }
+
+before_script:
+  - *load_helper_functions
