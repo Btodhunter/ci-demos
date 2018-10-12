@@ -64,7 +64,8 @@ container_scan:
 anchore_reports:
   stage: publish
   image: alpine:latest
-  dependencies: container_scan
+  dependencies:
+    - container_scan
 
   variables:
     GIT_STRATEGY: none
