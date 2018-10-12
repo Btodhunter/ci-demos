@@ -74,10 +74,10 @@ anchore_reports:
     - apk add jq
     - |
         echo "Parsing anchore reports."
-        printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
-        jq '.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln] | join(", ")}' image-vuln-report.json -c || true
         printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
         jq '.content[] | .package' image-content-os-report.json | sort || true
+        printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
+        jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' image-vuln-report.json || true
 
 container_publish:
   stage: publish
