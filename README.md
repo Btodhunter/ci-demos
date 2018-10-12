@@ -12,3 +12,15 @@ After container is built, it is sent through an Anchore engine scan.
 * A timeout of 500s is used for this project, this value can be adjusted for whatever container is being scanned with the `ANCHORE_TIMEOUT` environment variable. Some containers take longer to scan than others.
 
 To gate the container publish on a successful Anchore Engine scan, set the environment variable `ANCHORE_FAIL_ON_POLICY='true'`. This will cause pipeline to fail if scan fails.
+
+### Reports provided by Anchore
+
+When Anchore scanning finishes, by default, the following reports are available as artifacts. Report generation is configurable in anchore_ci_tools.py with the --content & --report flags.
+* `image-content-os-report.json` - all OS packages installed in image.
+* `image-content-npm-report.json` - all NPM modules installed in image.
+* `image-content-gem-report.json` - all Ruby gems installed in image.
+* `image-content-python-report.json` - all Python modules installed in image.
+* `image-content-java-report.json` - all Java modules installed in image.
+* `image-vuln-report.json` - all CVE's found in image.
+* `image-details-report.json` - image metadata utilized by Anchore engine.
+* `image-policy-report.json` - details of policy applied to the Anchore scan.
