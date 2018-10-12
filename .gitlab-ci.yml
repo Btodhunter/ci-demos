@@ -61,6 +61,23 @@ container_scan:
     paths:
     - image-*-report.json
 
+anchore_reports:
+  stage: publish
+  image: alpine:latest
+  dependencies: container_scan
+
+  variables:
+    GIT_STRATEGY: none
+
+  script:
+    - apk add jq
+    - |
+        echo "Parsing anchore reports."
+        printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
+        jq '.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln] | join(", ")}' image-vuln-report.json -c || true
+        printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
+        jq '.content[] | .package' image-content-os-report.json | sort || true
+
 container_publish:
   stage: publish
   image: docker:stable
