@@ -59,7 +59,7 @@ container_scan:
   artifacts:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
     paths:
-    - image-*-report.json
+    - anchore-reports/*
 
 anchore_reports:
   stage: publish
@@ -75,9 +75,9 @@ anchore_reports:
     - |
         echo "Parsing anchore reports."
         printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
-        jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' image-content-os-report.json || true
+        jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/image-content-os-report.json || true
         printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
-        jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' image-vuln-report.json || true
+        jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/image-vuln-report.json || true
 
 container_publish:
   stage: publish
