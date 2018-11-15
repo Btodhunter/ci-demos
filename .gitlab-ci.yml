@@ -16,7 +16,7 @@ container_build:
     DOCKER_DRIVER: overlay2
 
   script:
-    - docker_login
+    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
     - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
     - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
     - docker push "$IMAGE_NAME"
@@ -90,7 +90,7 @@ container_publish:
     GIT_STRATEGY: none
 
   script:
-    - docker_login
+    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
     - docker pull "$IMAGE_NAME"
     - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
     - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
@@ -99,17 +99,3 @@ container_publish:
           docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
           docker push "${CI_REGISTRY_IMAGE}:latest"
         fi
-
-# Note: YAML anchors allow an object to be re-used, reducing duplication.
-# The ampersand declares an alias for an object, then later the `*name`
-# syntax dereferences it.
-
-# Use YAML anchor to create helper functions that can be called in all jobs.
-# Functions are setup in the global 'before_script:' section.
-.load_helper_functions: &load_helper_functions |
-  function docker_login() {
-    docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
-  }
-
-before_script:
-  - *load_helper_functions
