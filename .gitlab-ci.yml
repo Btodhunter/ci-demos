@@ -32,11 +32,6 @@ container_scan:
 
   variables:
     GIT_STRATEGY: none
-    ANCHORE_HOST_ID: "localhost"
-    ANCHORE_ENDPOINT_HOSTNAME: "localhost"
-    ANCHORE_CLI_USER: "admin"
-    ANCHORE_CLI_PASS: "foobar"
-    ANCHORE_CLI_SSL_VERIFY: "n"
     ANCHORE_FAIL_ON_POLICY: "false"
     ANCHORE_TIMEOUT: 500
 
