@@ -24,10 +24,10 @@ container_build:
 container_scan:
   stage: scan
   image:
-    name: anchore/anchore-engine:v0.2.4
+    name: anchore/anchore-engine:v0.3.0
     entrypoint: [""]
   services:
-    - name: anchore/engine-db-preload:v0.2.4
+    - name: anchore/engine-db-preload:v0.3.0
       alias: anchore-db
 
   variables:
@@ -37,7 +37,7 @@ container_scan:
 
   script:
     - |
-        curl -o /tmp/anchore_ci_tools.py https://raw.githubusercontent.com/anchore/ci-tools/v0.2.4/scripts/anchore_ci_tools.py
+        curl -o /tmp/anchore_ci_tools.py https://raw.githubusercontent.com/anchore/ci-tools/v0.3.0/scripts/anchore_ci_tools.py
         chmod +x /tmp/anchore_ci_tools.py
         ln -s /tmp/anchore_ci_tools.py /usr/local/bin/anchore_ci_tools
     - anchore_ci_tools --setup
