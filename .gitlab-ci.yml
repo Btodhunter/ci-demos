@@ -49,6 +49,7 @@ container_scan:
         else
           set +o pipefail
           anchore-cli evaluate check "$IMAGE_NAME" | tee /dev/null
+          set -o pipefail
         fi
 
   artifacts:
