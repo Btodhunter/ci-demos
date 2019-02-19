@@ -16,39 +16,23 @@ container_build:
     DOCKER_DRIVER: overlay2
 
   script:
-    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
+    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
     - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
     - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
     - docker push "$IMAGE_NAME"
 
-container_scan:
+stateless_scan:
   stage: scan
   image:
-    name: anchore/anchore-engine:v0.3.0
-    entrypoint: [""]
+    name: docker:stable
   services:
-    - name: anchore/engine-db-preload:v0.3.0
-      alias: anchore-db
-
-  variables:
-    GIT_STRATEGY: none
-    ANCHORE_FAIL_ON_POLICY: "false"
-    ANCHORE_TIMEOUT: 500
-
+    - docker:stable-dind
+  
   script:
-    - |
-        curl -o /tmp/anchore_ci_tools.py https://raw.githubusercontent.com/anchore/ci-tools/v0.3.0/scripts/anchore_ci_tools.py
-        chmod +x /tmp/anchore_ci_tools.py
-        ln -s /tmp/anchore_ci_tools.py /usr/local/bin/anchore_ci_tools
-    - anchore_ci_tools --setup
-    - anchore-cli --u admin --p foobar registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate
-    - anchore_ci_tools --analyze --report --image "$IMAGE_NAME" --timeout "$ANCHORE_TIMEOUT"
-    - |
-        if [ "$ANCHORE_FAIL_ON_POLICY" == "true" ]; then
-          anchore-cli evaluate check "$IMAGE_NAME"
-        else
-          (set +o pipefail; anchore-cli evaluate check "$IMAGE_NAME" | tee /dev/null)
-        fi
+    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
+    - docker pull "$IMAGE_NAME"
+    - apk add curl bash
+    - curl -s https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan | bash -s -- -r "$IMAGE_NAME"
 
   artifacts:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}

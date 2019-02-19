@@ -1,4 +1,5 @@
 FROM node:8
+RUN apt-get update -y && apt-get upgrade -y
 RUN mkdir /app
 WORKDIR /app
 COPY . .
