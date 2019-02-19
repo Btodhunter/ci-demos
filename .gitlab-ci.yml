@@ -2,37 +2,36 @@ variables:
   IMAGE_NAME: ${CI_REGISTRY_IMAGE}/build:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}
 
 stages:
-  - build
-  - scan
-  - publish
+- build
+- scan
+- publish
 
 container_build:
   stage: build
   image: docker:stable
   services:
-    - docker:stable-dind
+  - docker:stable-dind
 
   variables:
     DOCKER_DRIVER: overlay2
 
   script:
-    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
-    - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
-    - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
-    - docker push "$IMAGE_NAME"
+  - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
+  - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
+  - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
+  - docker push "$IMAGE_NAME"
 
-stateless_scan:
+stateless_scan_script:
   stage: scan
-  image:
-    name: docker:stable
+  image: docker:stable
   services:
-    - docker:stable-dind
+  - docker:stable-dind
   
   script:
-    - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
-    - docker pull "$IMAGE_NAME"
-    - apk add curl bash
-    - curl -s https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan | bash -s -- -r "$IMAGE_NAME"
+  - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
+  - docker pull "$IMAGE_NAME"
+  - apk add curl bash
+  - curl -s https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan | bash -s -- -r "$IMAGE_NAME"
 
   artifacts:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
@@ -43,37 +42,37 @@ anchore_reports:
   stage: publish
   image: alpine:latest
   dependencies:
-    - container_scan
+  - container_scan
 
   variables:
     GIT_STRATEGY: none
 
   script:
-    - apk add jq
-    - |
-        echo "Parsing anchore reports."
-        printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
-        jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/image-content-os-report.json || true
-        printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
-        jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/image-vuln-report.json || true
+  - apk add jq
+  - |
+      echo "Parsing anchore reports."
+      printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
+      jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/image-content-os-report.json || true
+      printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
+      jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/image-vuln-report.json || true
 
 container_publish:
   stage: publish
   image: docker:stable
   services:
-    - docker:stable-dind
+  - docker:stable-dind
 
   variables:
     DOCKER_DRIVER: overlay2
     GIT_STRATEGY: none
 
   script:
-    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
-    - docker pull "$IMAGE_NAME"
-    - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
-    - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
-    - |
-        if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
-          docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
-          docker push "${CI_REGISTRY_IMAGE}:latest"
-        fi
+  - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
+  - docker pull "$IMAGE_NAME"
+  - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+  - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
+  - |
+      if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+        docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
+        docker push "${CI_REGISTRY_IMAGE}:latest"
+      fi
