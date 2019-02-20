@@ -27,7 +27,7 @@ container_scan:
   image: docker.io/anchore/inline-scan:dev
   
   script:
-  - nohup /docker-entrypoint.sh start &> /var/log/anchore.log &
+  - nohup docker-entrypoint.sh start &> /var/log/anchore.log &
   - anchore_ci_tools.py --wait
   - anchore-cli image add "$IMAGE_NAME"
   - anchore_ci_tools.py --wait --image "$IMAGE_NAME"
