@@ -24,13 +24,24 @@ container_build:
 
 container_scan:
   stage: scan
-  image: docker.io/anchore/inline-scan:dev
+  variables:
+    ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
+  image: docker.io/anchore/engine-cli:latest
+  services:
+  - name: docker.io/anchore/inline-scan:dev
+    alias: anchore-engine
+    command: ["start"]
   
   script:
-  - nohup docker-entrypoint.sh start &> /var/log/anchore.log &
-  - anchore_ci_tools.py --wait
+  - anchore-cli system wait
+  - anchore-cli --u admin --p foobar registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
   - anchore-cli image add "$IMAGE_NAME"
-  - anchore_ci_tools.py --wait --image "$IMAGE_NAME"
+  - anchore-cli image wait "$IMAGE_NAME"
+
+  artifacts:
+    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
+    paths:
+    - anchore-reports/*
 
 anchore_reports:
   stage: publish
