@@ -1,5 +1,6 @@
 variables:
   IMAGE_NAME: ${CI_REGISTRY_IMAGE}/build:${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHA}
+  SHARE_PATH: /builds/${CI_PROJECT_PATH}/share
 
 stages:
 - build
@@ -18,8 +19,8 @@ container_build:
   - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
   - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
   - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
-  - apk add curl bash
-  - curl -s https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan | bash -s -- -r "$IMAGE_NAME"
+  - docker save "$IMAGE_NAME" -o "${SHARE_PATH}/image.tar"
+  - docker run -it -v ${SHARE_PATH}:/anchore-engine docker.io/anchore/inline_scan:dev
   - docker push "$IMAGE_NAME"
 
   artifacts:
@@ -40,10 +41,16 @@ anchore_reports:
   - apk add jq
   - |
       echo "Parsing anchore reports."
-      printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
-      jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/image-content-os-report.json || true
-      printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
-      jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/image-vuln-report.json || true
+      for f in anchore-reports/*; do
+        if [[ "$f" =~ "content-os" ]]; then
+          printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
+          jq '[.content | sort_by(.package) | .[] | {package: .package, version: .version}]' anchore-reports/image-content-os-report.json || true
+        fi
+        if [[ "$f" =~ "vuln" ]]; then
+          printf "\n%s\n" "The following vulnerabilites were found on ${IMAGE_NAME}:"
+          jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' anchore-reports/image-vuln-report.json || true
+        fi
+      done
 
 container_publish:
   stage: publish
