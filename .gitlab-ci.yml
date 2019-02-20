@@ -21,7 +21,7 @@ container_build:
   - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
   - mkdir -p "$SHARE_PATH"
   - docker save "$IMAGE_NAME" -o "${SHARE_PATH}/image.tar"
-  - docker run -v ${SHARE_PATH}:/anchore-engine docker.io/anchore/inline_scan:dev
+  - docker run -v ${SHARE_PATH}:/anchore-engine docker.io/anchore/inline-scan:dev
   - docker push "$IMAGE_NAME"
 
   artifacts:
