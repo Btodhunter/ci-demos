@@ -19,6 +19,7 @@ container_build:
   - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
   - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
   - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
+  - mkdir -p "$SHARE_PATH"
   - docker save "$IMAGE_NAME" -o "${SHARE_PATH}/image.tar"
   - docker run -it -v ${SHARE_PATH}:/anchore-engine docker.io/anchore/inline_scan:dev
   - docker push "$IMAGE_NAME"
