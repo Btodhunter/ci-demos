@@ -11,4 +11,5 @@ before_install:
   - docker build -t "${IMAGE_NAME}:ci" .
   - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan" | bash -s -- -r "${IMAGE_NAME}:ci"
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+  - docker tag "${IMAGE_NAME}:ci" "${IMAGE_NAME}:${IMAGE_TAG}"
   - docker push "${IMAGE_NAME}:${IMAGE_TAG}"
