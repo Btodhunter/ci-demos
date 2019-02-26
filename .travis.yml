@@ -3,6 +3,10 @@ language: node_js
 services:
   - docker
 
+env:
+  - IMAGE_NAME=anchore-ci-demo
+  - IMAGE_TAG=travisci
+
 before_install:
   - docker build -t "${IMAGE_NAME}:ci" .
   - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan" | bash -s -- -r "${IMAGE_NAME}:ci"
