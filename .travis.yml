@@ -4,7 +4,7 @@ services:
   - docker
 
 env:
-  - IMAGE_NAME="anchore-ci-demo" IMAGE_TAG="travisci"
+  - IMAGE_NAME="btodhunter/anchore-ci-demo" IMAGE_TAG="travisci"
 
 before_install:
   - docker build -t "${IMAGE_NAME}:ci" .
