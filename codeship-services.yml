@@ -1,0 +1,7 @@
+dind:
+  add_docker: true
+  image: docker:stable-git
+  environment:
+    IMAGE_NAME: btodhunter/anchore-codeship-demo
+    IMAGE_TAG: latest
+  encrypted_env_file: env.encrypted
