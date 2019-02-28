@@ -17,19 +17,8 @@ pipeline{
         }
         stage('Scan') {
             steps {        
-                try {
-                    sh 'apk add bash'
-                    def ret = sh script: 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/scripts/inline_scan | bash -s -- -f ${IMAGE_NAME}:ci', returnStatus:true
-                    if (ret != 0) {
-                        echo "Return code from inline_scan: ${ret}. Failing the build"
-                        currentBuild.result = 'FAILURE'
-                        return
-                    }
-                }
-                catch (exc) {
-                    echo 'Something failed'
-                    throw exc
-                }
+                sh 'apk add bash'
+                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/scripts/inline_scan | bash -s -- -f ${IMAGE_NAME}:ci'
             }
         }
         stage('Push Image') {
