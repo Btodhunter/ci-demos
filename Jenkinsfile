@@ -1,28 +1,43 @@
-
-node {
-    stage('Clone repository') {
-        checkout scm
+pipeline{
+    agent any
+    environment {
+        IMAGE_NAME=btodhunter/anchore-demo
+        IMAGE_TAG=jenkins
     }
-    stage('Build Image') {
-        sh 'docker build -t btodhunter/anchore-demo:ci .'
-    }
-    stage('Scan') {
-        try {
-            sh 'apk add bash'
-            def ret = sh script: 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/scripts/inline_scan | bash -s -- -f btodhunter/anchore-demo:ci', returnStatus:true
-            if (ret != 0) {
-                echo "Return code from inline_scan: ${ret}. Failing the build"
-                currentBuild.result = 'FAILURE'
-                return
+    stages {
+        stage('Clone repository') {
+            steps {
+                checkout scm
             }
         }
-        catch (exc) {
-            echo 'Something failed'
-            throw exc
+        stage('Build Image') {
+            steps {
+                sh 'docker build -t ${IMAGE_NAME}:ci .'
+            }
         }
-        stage('Push Image') {
-            sh 'docker tag btodhunter/anchore-demo:ci btodhunter/anchore-demo:jenkins'
-            sh 'docker push btodhunter/anchore-demo:jenkins'
+        stage('Scan') {
+            steps {        
+                try {
+                        sh 'apk add bash'
+                        def ret = sh script: 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/scripts/inline_scan | bash -s -- -f ${IMAGE_NAME}:ci', returnStatus:true
+                        if (ret != 0) {
+                            echo "Return code from inline_scan: ${ret}. Failing the build"
+                            currentBuild.result = 'FAILURE'
+                            return
+                        }
+                    }
+                    catch (exc) {
+                        echo 'Something failed'
+                        throw exc
+                    }
+                }
+            }
+            stage('Push Image') {
+                steps {
+                    sh 'docker tag ${IMAGE_NAME}:ci $I{MAGE_NAME}:${IMAGE_TAG}'
+                    sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
+                }
+            }
         }
     }
 }
