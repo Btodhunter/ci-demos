@@ -1,8 +1,8 @@
 pipeline{
     agent any
     environment {
-        IMAGE_NAME=btodhunter/anchore-demo
-        IMAGE_TAG=jenkins
+        IMAGE_NAME = 'btodhunter/anchore-demo'
+        IMAGE_TAG = 'jenkins'
     }
     stages {
         stage('Clone repository') {
