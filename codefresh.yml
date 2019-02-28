@@ -1,0 +1,24 @@
+version: '1.0'
+steps:
+  build_docker_image:
+    title: Building Docker Image
+    type: build
+    image_name: btodhunter/ci-demos
+    working_directory: ./
+    tag: codefresh
+    dockerfile: Dockerfile
+
+  anchore_scan:
+    title: Scanning Docker Image
+    image: docker:stable-git
+    description: Analyzing Image with Anchore Engine.
+    commands:
+      - apk add curl bash
+      - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan" | bash -s -- -r ${{build_image}}
+  
+  push_to_registry:
+    title: Pushing to Docker Registry 
+    type: push
+    candidate: '${{build_image}}'
+    tag: codefresh
+    registry: dockerhub
