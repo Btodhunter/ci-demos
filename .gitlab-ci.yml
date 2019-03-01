@@ -33,17 +33,21 @@ container_scan_service:
   variables:
     ANCHORE_CLI_URL: "http://anchore-engine:8228/v1"
     GIT_STRATEGY: none
-  image: docker.io/anchore/engine-cli:latest
+  image: docker.io/anchore/inline-scan:latest
   services:
-  - name: docker.io/anchore/inline-scan:dev
+  - name: docker.io/anchore/inline-scan:latest
     alias: anchore-engine
     command: ["start"]
   
   script:
   - anchore-cli system wait
   - anchore-cli --u admin --p foobar registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
-  - anchore-cli image add "$IMAGE_NAME"
-  - anchore-cli image wait "$IMAGE_NAME"
+  - anchore_ci_tools.py -a -r --image $IMAGE_NAME
+
+  artifacts:
+    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
+    paths:
+    - anchore-reports/*
 
 anchore_reports:
   stage: publish
