@@ -3,7 +3,7 @@ steps:
   build_docker_image:
     title: Building Docker Image
     type: build
-    image_name: btodhunter/anchore-demo
+    image_name: btodhunter/anchore-ci-demo
     tag: ci
     working_directory: ./
     dockerfile: Dockerfile
@@ -26,7 +26,7 @@ steps:
           - anchore-engine
         environment:
           - ANCHORE_CLI_URL=http://anchore-engine:8228/v1/
-        command: bash -c 'anchore-cli system wait && anchore_ci_tools.py -a -r --image btodhunter/anchore-demo:ci'
+        command: bash -c 'anchore-cli system wait && anchore_ci_tools.py -a -r --image $build_docker_image'
       
   push_to_registry:
     title: Pushing to Docker Registry 
