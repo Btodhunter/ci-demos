@@ -4,6 +4,7 @@ steps:
     title: Building Docker Image
     type: build
     image_name: btodhunter/anchore-demo
+    tag: ci
     working_directory: ./
     dockerfile: Dockerfile
 
@@ -21,7 +22,7 @@ steps:
         image: anchore/inline-scan:latest
         links:
           - anchore-engine
-        command: anchore-ci-tools.py -a -r --image btodhunter/anchore-demo:ci
+        command: anchore_ci_tools.py -a -r --image ${{build_docker_image}}
       
   push_to_registry:
     title: Pushing to Docker Registry 
