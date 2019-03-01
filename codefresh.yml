@@ -3,7 +3,7 @@ steps:
   build_docker_image:
     title: Building Docker Image
     type: build
-    image_name: btodhunter/anchore-ci-demo
+    image_name: ${{IMAGE_NAME}}
     tag: ci
     working_directory: ./
     dockerfile: Dockerfile
@@ -26,12 +26,11 @@ steps:
           - anchore-engine
         environment:
           - ANCHORE_CLI_URL=http://anchore-engine:8228/v1/
-          - IMAGE_NAME=${{build_docker_image}}
-        command: bash -xc 'anchore-cli system wait && anchore_ci_tools.py -a -r --image $IMAGE_NAME'
+        command: bash -xc 'anchore-cli system wait && anchore-cli registry add r.cfcr.io $DOCKER_USER $DOCKER_PASS --skip-validate && anchore_ci_tools.py -a -r --image r.cfcr.io/btodhunter/${IMAGE_NAME}:ci'
       
   push_to_registry:
     title: Pushing to Docker Registry 
     type: push
     candidate: '${{build_docker_image}}'
-    tag: codefresh
+    tag: ${{IMAGE_TAG}}
     registry: dockerhub
