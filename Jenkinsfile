@@ -12,7 +12,9 @@ pipeline{
         stage('Build Image') {
             steps {
                 //sh 'docker build -t ${IMAGE_NAME}:ci .'
-                def customImage = docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                script {
+                    def customImage = docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
+                }
             }
         }
         stage('Scan') {
@@ -23,8 +25,10 @@ pipeline{
         }
         stage('Push Image') {
             steps {
-                docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds')
-                    customImage.push()
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-creds')
+                        customImage.push()
+                }
                 //sh 'docker tag ${IMAGE_NAME}:ci ${IMAGE_NAME}:${IMAGE_TAG}'
                 //sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
             }
