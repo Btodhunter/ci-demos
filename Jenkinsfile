@@ -5,7 +5,7 @@ pipeline{
         }
     }
     environment {
-        IMAGE_NAME = 'btodhunter/anchore-demo'
+        IMAGE_NAME = 'btodhunter/anchore-ci-demo'
         IMAGE_TAG = 'jenkins'
     }
     stages {

@@ -18,7 +18,7 @@ steps:
           image: anchore/inline-scan:latest
           ports:
             - 8228
-          command: start
+          command: bash -c 'docker-entrypoint.sh start &> /dev/null'
     composition_candidates:
       scan_image:
         image: anchore/inline-scan:latest
@@ -26,7 +26,7 @@ steps:
           - anchore-engine
         environment:
           - ANCHORE_CLI_URL=http://anchore-engine:8228/v1/
-        command: bash -c 'anchore_ci_tools.py --wait && anchore_ci_tools.py -a -r --image btodhunter/anchore-demo:ci'
+        command: bash -c 'anchore-cli system wait && anchore_ci_tools.py -a -r --image btodhunter/anchore-demo:ci'
       
   push_to_registry:
     title: Pushing to Docker Registry 
