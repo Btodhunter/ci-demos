@@ -25,8 +25,9 @@ pipeline{
         stage('Push Image') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub-creds')
+                    docker.withRegistry('', 'dockerhub-creds'){
                         customImage.push()
+                    }
                 }
             }
         }
