@@ -16,6 +16,8 @@ steps:
       services:
         anchore-engine:
           image: anchore/inline-scan:latest
+          ports:
+            - 8228
           command: start
     composition_candidates:
       scan_image:
