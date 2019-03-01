@@ -26,7 +26,8 @@ steps:
           - anchore-engine
         environment:
           - ANCHORE_CLI_URL=http://anchore-engine:8228/v1/
-        command: bash -c 'anchore-cli system wait && anchore_ci_tools.py -a -r --image $build_docker_image'
+          - IMAGE_NAME=${{build_docker_image}}
+        command: bash -xc 'anchore-cli system wait && anchore_ci_tools.py -a -r --image $IMAGE_NAME'
       
   push_to_registry:
     title: Pushing to Docker Registry 
