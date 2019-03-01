@@ -4,6 +4,7 @@ steps:
     title: Building Docker Image
     type: build
     image_name: btodhunter/anchore-demo
+    tag: ci
     working_directory: ./
     dockerfile: Dockerfile
 
@@ -12,7 +13,7 @@ steps:
     image: codefresh/docker-service
     description: Analyzing Image with Anchore Engine.
     commands:
-      - "curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -r ${{build_docker_image}}"
+      - "curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -r btodhunter/anchore-demo:ci"
   
   push_to_registry:
     title: Pushing to Docker Registry 
