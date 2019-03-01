@@ -1,0 +1,10 @@
+version: 2.0
+
+phases:
+  build:
+    commands:
+      - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+
+  scan:
+    commands:
+      - curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- ${IMAGE_NAME}:$IMAGE_TAG
