@@ -12,7 +12,7 @@ steps:
     image: codefresh/docker-service
     description: Analyzing Image with Anchore Engine.
     commands:
-      - curl -s https://raw.githubusercontent.com/anchore/ci-tools/scripts/inline_scan | bash -s -- -r ${{build_docker_image}}
+      - curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -r ${{build_docker_image}}
   
   push_to_registry:
     title: Pushing to Docker Registry 

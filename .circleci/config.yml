@@ -16,7 +16,7 @@ jobs:
         name: Scan image
         command: |
           apk add curl bash
-          curl -s "https://raw.githubusercontent.com/anchore/ci-tools/stateless_ci_container/scripts/inline_scan" | bash -s -- -r "${IMAGE_NAME}:ci"
+          curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- -r "${IMAGE_NAME}:ci"
     - run:
         name: Push to Dockerhub
         command: |
