@@ -14,11 +14,11 @@ steps:
       version: '2'
       services:
         anchore-engine:
-          image: anchore/inline_scan:latest
+          image: anchore/inline-scan:latest
           command: start
     composition_candidates:
       scan_image:
-        image: anchore/inline_scan:latest
+        image: anchore/inline-scan:latest
         links:
           - anchore-engine
         command: anchore-ci-tools.py -a -r --image btodhunter/anchore-demo:ci
