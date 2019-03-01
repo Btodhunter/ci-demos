@@ -1,6 +1,6 @@
 # Anchore CI Demos
 
-## Example of a container build pipeline, including an Anchore Engine image security scanning
+## Example of a container build pipeline, including an Anchore Engine image security scan
 
 Contains a very simple Nodejs application, which is published to a registry as a runnable docker container.
 
