@@ -1,15 +1,14 @@
 pipeline{
-    agent any
+    agent {
+        docker {
+            image 'docker:stable-git'
+        }
+    }
     environment {
         IMAGE_NAME = 'btodhunter/anchore-demo'
         IMAGE_TAG = 'jenkins'
     }
     stages {
-        stage('Clone repository') {
-            steps {
-                checkout scm
-            }
-        }
         stage('Build Image') {
             steps {
                 sh 'docker build -t ${IMAGE_NAME}:ci .'
@@ -17,7 +16,7 @@ pipeline{
         }
         stage('Scan') {
             steps {        
-                sh 'apk add bash'
+                sh 'apk add bash curl'
                 sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -f ${IMAGE_NAME}:ci'
             }
         }
