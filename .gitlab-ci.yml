@@ -84,12 +84,7 @@ container_publish:
     GIT_STRATEGY: none
 
   script:
-  - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "${CI_REGISTRY}"
+  - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
   - docker pull "$IMAGE_NAME"
-  - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
-  - docker push "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}"
-  - |
-      if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
-        docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
-        docker push "${CI_REGISTRY_IMAGE}:latest"
-      fi
+  - docker tag "$IMAGE_NAME" "${CI_REGISTRY_IMAGE}:latest"
+  - docker push "${CI_REGISTRY_IMAGE}:latest"
