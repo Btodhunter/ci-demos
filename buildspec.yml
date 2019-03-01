@@ -1,4 +1,4 @@
-version: 2.0
+version: 0.2
 
 phases:
   build:
@@ -8,3 +8,8 @@ phases:
   scan:
     commands:
       - curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- ${IMAGE_NAME}:$IMAGE_TAG
+
+  push:
+    commands:
+      - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+      - docker push $IMAGE_NAME:$IMAGE_TAG
