@@ -20,7 +20,7 @@ container_build:
   - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
   - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
   - apk add bash curl 
-  - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- -f "$IMAGE_NAME"
+  - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- "$IMAGE_NAME"
   - docker push "$IMAGE_NAME"
 
   artifacts:

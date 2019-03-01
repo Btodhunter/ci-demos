@@ -6,7 +6,7 @@ services:
 env:
   - IMAGE_NAME="btodhunter/anchore-ci-demo" IMAGE_TAG="travisci"
 
-before_install:
+script:
   - docker build -t "${IMAGE_NAME}:ci" .
   - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- "${IMAGE_NAME}:ci"
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
