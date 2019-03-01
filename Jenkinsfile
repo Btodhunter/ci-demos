@@ -11,23 +11,20 @@ pipeline{
     stages {
         stage('Build Image') {
             steps {
-                script {
-                    def customImage = docker.build("${env.IMAGE_NAME}:${env.IMAGE_TAG}")
-                }
+                sh 'docker build -t ${IMAGE_NAME}:ci .'
             }
         }
         stage('Scan') {
             steps {        
                 sh 'apk add bash curl'
-                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- ${IMAGE_NAME}:${IMAGE_TAG}'
+                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- ${IMAGE_NAME}:ci'
             }
         }
         stage('Push Image') {
             steps {
-                script {
-                    docker.withRegistry('', 'dockerhub-creds'){
-                        customImage.push()
-                    }
+                withDockerRegistry([credentialsId: "dockerhub-cred", url: ""]){
+                    sh 'docker tag ${IMAGE_NAME}:ci ${IMAGE_NAME}:${IMAGE_TAG}'
+                    sh 'docker push ${IMAGE_NAME}:${IMAGE_TAG}'
                 }
             }
         }

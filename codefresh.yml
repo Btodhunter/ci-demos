@@ -22,7 +22,7 @@ steps:
         image: anchore/inline-scan:latest
         links:
           - anchore-engine
-        command: anchore_ci_tools.py -a -r --image ${{build_docker_image}}
+        command: anchore_ci_tools.py -a -r --image btodhunter/anchore-demo:ci
       
   push_to_registry:
     title: Pushing to Docker Registry 
