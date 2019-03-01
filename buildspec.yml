@@ -5,11 +5,8 @@ phases:
     commands:
       - docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
-  scan:
+  post_build:
     commands:
       - curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- ${IMAGE_NAME}:$IMAGE_TAG
-
-  push:
-    commands:
       - echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
       - docker push $IMAGE_NAME:$IMAGE_TAG
