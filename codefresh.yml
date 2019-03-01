@@ -25,7 +25,7 @@ steps:
         links:
           - anchore-engine
         environment:
-          - ANCHORE_CLI_URL='http://anchore-engine:8228/v1/'
+          - ANCHORE_CLI_URL=http://anchore-engine:8228/v1/
         command: bash -c 'anchore_ci_tools.py --wait && anchore_ci_tools.py -a -r --image btodhunter/anchore-demo:ci'
       
   push_to_registry:
