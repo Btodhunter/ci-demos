@@ -17,10 +17,9 @@ container_build:
 
   script:
   - echo "$CI_JOB_TOKEN" | docker login -u gitlab-ci-token --password-stdin "${CI_REGISTRY}"
-  - docker pull "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" || true
-  - docker build --cache-from "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}" -t "$IMAGE_NAME" .
+  - docker build -t "$IMAGE_NAME" .
   - apk add bash curl 
-  - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- -t 500 "$IMAGE_NAME"
+  - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- -r -t 500 "$IMAGE_NAME"
   - docker push "$IMAGE_NAME"
 
   artifacts:
