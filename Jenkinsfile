@@ -17,7 +17,7 @@ pipeline{
         stage('Scan') {
             steps {        
                 sh 'apk add bash curl'
-                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -d ./Dockerfile ${IMAGE_NAME}:ci'
+                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -d ./Dockerfile -b ./.anchore_policy.json ${IMAGE_NAME}:ci'
             }
         }
         stage('Push Image') {

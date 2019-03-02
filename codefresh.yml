@@ -30,7 +30,7 @@ steps:
           - IMAGE_TAG=${{IMAGE_TAG}}
           - DOCKER_USER=${{DOCKER_USER}}
           - DOCKER_PASS=${{DOCKER_PASS}}
-        command: bash -xc 'anchore-cli system wait && anchore-cli registry add r.cfcr.io $DOCKER_USER $DOCKER_PASS --skip-validate && anchore_ci_tools.py -a -r --timeout 500 --image r.cfcr.io/btodhunter/${IMAGE_NAME}:ci'
+        command: bash -xc 'anchore-cli system wait && anchore-cli registry add r.cfcr.io $DOCKER_USER $DOCKER_PASS --skip-validate && anchore_ci_tools.py -a --timeout 500 --image r.cfcr.io/btodhunter/${IMAGE_NAME}:ci'
     composition_variables:
       - IMAGE_NAME=${{IMAGE_NAME}}
       - IMAGE_TAG=${{IMAGE_TAG}}

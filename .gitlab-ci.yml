@@ -40,7 +40,7 @@ container_scan_service:
   
   script:
   - anchore-cli system wait
-  - anchore-cli --u admin --p foobar registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
+  - anchore-cli registry add "$CI_REGISTRY" gitlab-ci-token "$CI_JOB_TOKEN" --skip-validate 
   - anchore_ci_tools.py -a -r --timeout 500 --image $IMAGE_NAME
 
   artifacts:
