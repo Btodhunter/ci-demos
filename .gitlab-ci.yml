@@ -23,6 +23,7 @@ container_build:
   - docker push "$IMAGE_NAME"
   - |
       echo "Parsing anchore reports."
+      apk add jq
       bash <<'EOF'
       for f in anchore-reports/*; do
         if [[ "$f" =~ "content-os" ]]; then
