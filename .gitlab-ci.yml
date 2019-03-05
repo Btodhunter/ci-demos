@@ -23,6 +23,7 @@ container_build:
   - docker push "$IMAGE_NAME"
   - |
       echo "Parsing anchore reports."
+      bash <<'EOF'
       for f in anchore-reports/*; do
         if [[ "$f" =~ "content-os" ]]; then
           printf "\n%s\n" "The following OS packages are installed on ${IMAGE_NAME}:"
@@ -33,6 +34,7 @@ container_build:
           jq '[.vulnerabilities | group_by(.package) | .[] | {package: .[0].package, vuln: [.[].vuln]}]' $f || true
         fi
       done
+      EOF
 
   artifacts:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}
