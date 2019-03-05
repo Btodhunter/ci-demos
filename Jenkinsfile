@@ -1,7 +1,7 @@
 pipeline{
     agent {
         docker {
-            image 'docker:stable-git'
+            image 'docker:stable'
         }
     }
     environment {
@@ -17,7 +17,7 @@ pipeline{
         stage('Scan') {
             steps {        
                 sh 'apk add bash curl'
-                sh 'curl -s https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan | bash -s -- -d ./Dockerfile -b ./.anchore_policy.json ${IMAGE_NAME}:ci'
+                sh 'curl -s https://ci-tools.anchore.io/inline_scan-v0.3.3 | bash -s -- -d ./Dockerfile -b ./.anchore_policy.json ${IMAGE_NAME}:ci'
             }
         }
         stage('Push Image') {

@@ -1,4 +1,4 @@
-dind:
+anchore:
   add_docker: true
   image: docker:stable-git
   environment:

@@ -8,7 +8,7 @@ env:
 
 script:
   - docker build -t "${IMAGE_NAME}:ci" .
-  - curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- "${IMAGE_NAME}:ci"
+  - curl -s https://ci-tools.anchore.io/inline_scan-v0.3.3 | bash -s -- "${IMAGE_NAME}:ci"
   - echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
   - docker tag "${IMAGE_NAME}:ci" "${IMAGE_NAME}:${IMAGE_TAG}"
   - docker push "${IMAGE_NAME}:${IMAGE_TAG}"

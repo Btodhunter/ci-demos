@@ -2,7 +2,7 @@ version: 2.1
 jobs:
   build_scan_image:
     docker:
-    - image: docker:stable-git
+    - image: docker:stable
     environment:
       IMAGE_NAME: btodhunter/anchore-ci-demo
       IMAGE_TAG: circleci
@@ -16,7 +16,7 @@ jobs:
         name: Scan image
         command: |
           apk add curl bash
-          curl -s "https://raw.githubusercontent.com/anchore/ci-tools/master/scripts/inline_scan" | bash -s -- -r "${IMAGE_NAME}:ci"
+          curl -s https://ci-tools.anchore.io/inline_scan-v0.3.3 | bash -s -- -r "${IMAGE_NAME}:ci"
     - run:
         name: Push to Dockerhub
         command: |
